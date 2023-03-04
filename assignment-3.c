@@ -20,41 +20,40 @@ void* countPrimes(void* arg){
 
     //divide work equally among each thread created
     int threadID = *(int*)arg; 
-    // printf("threadID: %d\n", threadID);
     int start = threadID * (maxNum / threadNum);
-    // printf("start value: %d\n", start);
     int end = (threadID+1) * (maxNum / threadNum);
-    // printf("end value: %d\n", end);        
     
 
-    // temp var storing sum of primes in each thread
+    // create temporary variable storing sum of primes in each thread
     int pSum = 0;
     int pCount=0;
 
 
+    // parse numbers and check if prime
     for (int i = start; i < end; i++) {
+        // flag for primeness
         int isPrime = 1;
         for (int j = 2; j < i; j++) {
-            // printf("\n i value: %d \n j value: %d \n", i, j);
-            if (i % j == 0) {
-                isPrime = 0;
+            if (i % j == 0) { // if number is divisible by j, number is prime
+                isPrime = 0; // change flag to 0 if not prime
                 break;
             }
         }
-        // confirm primeness excluding 0 and 1
+        // confirm primeness and exclude numbers 0 and 1
         if (isPrime==1 && i>1) {
-            pSum += i ;
-            pCount++;
-            // printf("\n pSum: %d \n pCount: %d", pSum, pCount);
+            pSum += i ; // increment sum of primes
+            pCount++; // increment count
             
         }
     }
-    threadSums[threadID] = pSum;
-    count[threadID] = pCount;
-    printf("for thread # %d . . . start = %d and end = %d . . . sum value: %d and prime count: %d\n", threadID, start, end, pSum, pCount);
-    // printf("\nprime count: %d\n\n", pCount);
 
-    pthread_exit(NULL);
+    threadSums[threadID] = pSum;    // populate sum of primes per each thread
+    count[threadID] = pCount;       // populate count of primes per each thread
+
+    printf("\nThread # %d is finding primes from low = %d to high %d ", threadID, start, end);
+    printf("\nSum of thread %d is %d, Count is %d", threadID, pSum, pCount);
+
+    pthread_exit(NULL);             // leave thread
 
 }
 
@@ -65,12 +64,11 @@ int main(int argc, char *argv[]) {
 
     // verify command line parameter input
     if (argc != 3) {
-        printf("Error: Please enter exactly two integer command-line parameters.\n");
+        printf("Proper usage is ./assignment-3 <threadCount> <highestInt>\n");
         return 1;
     }
     threadNum = atoi(argv[1]);
     maxNum = atoi(argv[2]);
-    printf("\nNumber of threads to be created: %d \nMax number to count primes up to: %d\n\n", threadNum, maxNum);
 
   
 	//allocate memory to store threads and sums
@@ -79,43 +77,42 @@ int main(int argc, char *argv[]) {
 
     //pointer to threads created
     pthread_t* threads = (pthread_t*)calloc(threadNum, sizeof(pthread_t));
+
     // pointer to threadIDs
     int* threadIDs = (int*)calloc(threadNum, sizeof(int));
     
+    // create threads corresponding to command line input
     for (int i = 0; i < threadNum; i++) {
         threadIDs[i] = i;
         pthread_create(&threads[i], NULL, countPrimes, &threadIDs[i]);
     }
 
-    // wait for threads
+    // wait for each thread
     for (int i = 0; i < threadNum; i++) {
         pthread_join(threads[i], NULL);
     }
     
+    // create variables to store GRAND SUM and COUNT
     int totalSum = 0;
     int numPrimes = 0;
 
 
     // parse set of sums per thread
     for (int i = 0; i < threadNum; i++) {
-        printf("\nthreadsums[i]: %d", threadSums[i]);
         totalSum += threadSums[i];
     }
     
 
     // parse set of prime numbers counted per thread
     for (int i = 0; i < threadNum; i++) {
-        // numPrimes += count[i]>=0;
         numPrimes += count[i];
-        // printf("\n numPrimes: %d ", numPrimes);
     }
 
+    printf("\n \n \tGRAND SUM IS %d, COUNT IS %d \n\n", totalSum, numPrimes);
 
 
 
-
-    printf("\n\nNumber of primes less than %d: %d\n", maxNum, numPrimes);
-    printf("\nSum of primes less than %d: %d\n", maxNum, totalSum);
+    //free allocated memory
     free(count);
     free(threadSums);
     free(threads);
