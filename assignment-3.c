@@ -105,7 +105,8 @@ int main(int argc, char *argv[]) {
 
     // parse set of prime numbers counted per thread
     for (int i = 0; i < threadNum; i++) {
-        numPrimes += count[i]>=0;
+        // numPrimes += count[i]>=0;
+        numPrimes += count[i];
         printf("\n numPrimes: %d ", numPrimes);
     }
 
