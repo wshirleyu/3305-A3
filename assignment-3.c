@@ -17,16 +17,23 @@
 
 int threadNum, maxNum;
 int *threadSums;
+int *count;
+
 
 void* countPrimes(void* arg){
-    printf("\n\n Entered countPrimes \n");
+    // printf("\n\n Entered countPrimes \n");
 
-
-    int threadID = *(int*)arg;
+    //divide work equally among each thread created
+    int threadID = *(int*)arg; 
+    printf("threadID: %d\n", threadID);
     int start = threadID * (maxNum / threadNum);
-    int end = (threadID + 1) * (maxNum / threadNum);
+    printf("start value: %d\n", start);
+    int end = (threadID+1) * (maxNum / threadNum);
+    printf("end value: %d\n", end);
 
-    int sum = 0;
+    // temp var storing sum of primes in each thread
+    int pSum = 0;
+    int primeCount=0;
     for (int i = start; i < end; i++) {
         int isPrime = 1;
         for (int j = 2; j < i; j++) {
@@ -36,10 +43,13 @@ void* countPrimes(void* arg){
             }
         }
         if (isPrime) {
-            sum += i;
+            pSum += i;
+            primeCount= primeCount+1;
+            
         }
     }
-    threadSums[threadID] = sum;
+    threadSums[threadID] = pSum;
+    printf("\nsum value: %d\n", pSum);
     pthread_exit(NULL);
 
 }
@@ -50,52 +60,20 @@ int main(int argc, char *argv[]) {
 
 
     // verify command line parameter input
-    // int threadNum, maxNum;
     if (argc != 3) {
         printf("Error: Please enter exactly two integer command-line parameters.\n");
         return 1;
     }
     threadNum = atoi(argv[1]);
     maxNum = atoi(argv[2]);
-    printf("The number of threads to be created is %d \n and the max number to count primes up to is is %d\n", threadNum, maxNum);
+    printf("\nNumber of threads to be created: %d \nMax number to count primes up to: %d\n", threadNum, maxNum);
 
-
-    // int *sum;
-
-    // pthread_t pSum; // holds information fo thread created
-    // pthread_create(&pSum, NULL, &routine, NULL);
-    // pthread_join(pSum, &sum)
-
-    // check if there's more than one thread
-	// if (threadNum == 1){
-        // create thread
-        // pthread_t pSum; 
-
-        // count primes
-        
-        // add primes
-        // return sum
-        
-    // }
-
-    
-    // else if (threadNum>0){
-    //     // create array to store threads
-    //     int count[threadNum] = {0};
-
-    //     // create array to store sums
-    //     int sum[threadNum]={0};
-
-        
-
-    // }
-		
-
-
-
+  
+	//allocate memory to store threads and sums
     threadSums = (int*)calloc(threadNum, sizeof(int));
     pthread_t* threads = (pthread_t*)calloc(threadNum, sizeof(pthread_t));
     int* threadIDs = (int*)calloc(threadNum, sizeof(int));
+    
     for (int i = 0; i < threadNum; i++) {
         threadIDs[i] = i;
         pthread_create(&threads[i], NULL, countPrimes, &threadIDs[i]);
@@ -103,6 +81,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < threadNum; i++) {
         pthread_join(threads[i], NULL);
     }
+    
     int totalSum = 0;
     int numPrimes = 0;
     for (int i = 0; i < threadNum; i++) {
