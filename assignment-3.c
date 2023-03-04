@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < threadNum; i++) {
         // numPrimes += count[i]>=0;
         numPrimes += count[i];
-        printf("\n numPrimes: %d ", numPrimes);
+        // printf("\n numPrimes: %d ", numPrimes);
     }
 
 
