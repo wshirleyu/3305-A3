@@ -11,8 +11,8 @@
 #include <pthread.h>
 
 int threadNum, maxNum;
-int *threadSums;
-int *count;
+long int *threadSums;
+long int *count;
 
 /**
  * method to count and add the prime numbers in a range 
@@ -24,14 +24,14 @@ void* countPrimes(void* arg){
 
 
     // set ranges to divide work equally among each thread created
-    int threadID = *(int*)arg;      // pointer to ID to access each individual thread
-    int start = threadID * (maxNum / threadNum);
-    int end = (threadID+1) * (maxNum / threadNum);
+    long int threadID = *(int*)arg;      // pointer to ID to access each individual thread
+    long int start = threadID * (maxNum / threadNum);
+    long int end = (threadID+1) * (maxNum / threadNum);
 
 
     // create temporary variable storing sum of primes in each thread
-    int pSum = 0;
-    int pCount=0;
+    long int pSum = 0;
+    long int pCount=0;
 
 
     // parse numbers and check if prime
@@ -54,8 +54,8 @@ void* countPrimes(void* arg){
     threadSums[threadID] = pSum;    // populate sum of primes per each thread
     count[threadID] = pCount;       // populate count of primes per each thread
 
-    printf("\nThread # %d is finding primes from low = %d to high %d ", threadID, start, end);
-    printf("\nSum of thread %d is %d, Count is %d", threadID, pSum, pCount);
+    printf("\nThread # %ld is finding primes from low = %ld to high %ld ", threadID, start, end);
+    printf("\nSum of thread %ld is %ld, Count is %ld", threadID, pSum, pCount);
 
     pthread_exit(NULL);             // leave thread
 
@@ -75,14 +75,14 @@ int main(int argc, char *argv[]) {
     maxNum = atoi(argv[2]);
 
 	//allocate memory to store threads and sums
-    threadSums = (int*)calloc(threadNum, sizeof(int));
-    count = (int*)calloc(threadNum, sizeof(int));
+    threadSums = (long int*)calloc(threadNum, sizeof(long int));
+    count = (long int*)calloc(threadNum, sizeof(long int));
 
     //allocate memory to point to threads created
     pthread_t* threads = (pthread_t*)calloc(threadNum, sizeof(pthread_t));
 
     // pointer to threadIDs
-    int* threadIDs = (int*)calloc(threadNum, sizeof(int));
+    long int* threadIDs = (long int*)calloc(threadNum, sizeof(int));
     
     // create threads corresponding to number from command line input
     for (int i = 0; i < threadNum; i++) {
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     }
     
     // create variables to store GRAND SUM and COUNT outputs
-    int totalSum = 0;
-    int numPrimes = 0;
+    long int totalSum = 0;
+    long int numPrimes = 0;
 
     // parse set of sums per thread
     for (int i = 0; i < threadNum; i++) {
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (totalSum>0 && numPrimes>0){
-            printf("\n \n \tGRAND SUM IS %d, COUNT IS %d \n\n", totalSum, numPrimes);
+            printf("\n \n \tGRAND SUM IS %ld, COUNT IS %ld \n\n", totalSum, numPrimes);
     }
 
     //free allocated memory
