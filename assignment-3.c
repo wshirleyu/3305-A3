@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-int threadNum, maxNum;
+long int threadNum, maxNum;
 long int *threadSums;
 long int *count;
 
@@ -24,7 +24,7 @@ void* countPrimes(void* arg){
 
 
     // set ranges to divide work equally among each thread created
-    long int threadID = *(int*)arg;      // pointer to ID to access each individual thread
+    long int threadID = *(long int*)arg;      // pointer to ID to access each individual thread
     long int start = threadID * (maxNum / threadNum);
     long int end = (threadID+1) * (maxNum / threadNum);
 
@@ -54,7 +54,7 @@ void* countPrimes(void* arg){
     threadSums[threadID] = pSum;    // populate sum of primes per each thread
     count[threadID] = pCount;       // populate count of primes per each thread
 
-    printf("\nThread # %ld is finding primes from low = %ld to high %ld ", threadID, start, end);
+    printf("\nThread # %ld is finding primes from low = %ld to high = %ld ", threadID, start, end);
     printf("\nSum of thread %ld is %ld, Count is %ld", threadID, pSum, pCount);
 
     pthread_exit(NULL);             // leave thread
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     pthread_t* threads = (pthread_t*)calloc(threadNum, sizeof(pthread_t));
 
     // pointer to threadIDs
-    long int* threadIDs = (long int*)calloc(threadNum, sizeof(int));
+    long int* threadIDs = (long int*)calloc(threadNum, sizeof(long int));
     
     // create threads corresponding to number from command line input
     for (int i = 0; i < threadNum; i++) {
